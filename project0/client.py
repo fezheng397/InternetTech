@@ -29,8 +29,6 @@ def client():
     exit()
 
 if __name__ == "__main__":
-    t1 = threading.Thread(name='server', target=server)
-    t1.start()
 
     time.sleep(random.random() * 5)
     t2 = threading.Thread(name='client', target=client)
