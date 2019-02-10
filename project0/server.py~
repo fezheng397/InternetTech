@@ -12,7 +12,7 @@ def server():
         print('socket open error: {}\n'.format(err))
         exit()
 
-    server_binding = ('', 50007)
+    server_binding = ('', 50008)
     ss.bind(server_binding)
     ss.listen(1)
     host = socket.gethostname()
