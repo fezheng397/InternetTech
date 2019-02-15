@@ -1,10 +1,11 @@
 import threading
 import time
 import random
-import os
+import sys, os
 import socket
 
-def server():
+def server(rsListenPort):
+    print(rsListenPort)
     try:
         ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print("[S]: Server socket created")
@@ -38,7 +39,11 @@ def reverse(msg):
 	return msg[::-1]
 
 if __name__ == "__main__":
-    t1 = threading.Thread(name='server', target=server)
+    if(not sys.argv[1].isdigit()):
+        print("Please enter an integer hostname")
+        os.exit(0)
+    
+    t1 = threading.Thread(name='server', target=server, args=([sys.argv[1]]))
     t1.start()
 
     time.sleep(5)
