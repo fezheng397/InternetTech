@@ -40,7 +40,7 @@ if __name__ == "__main__":
     t2 = threading.Thread(name='client', target=client)
     t2.start()
 
-    time.sleep(15)
+    time.sleep(5)
     print("Done.")
     #Exit program
     os._exit(0)

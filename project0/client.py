@@ -14,7 +14,7 @@ def client():
         
     # Define the port on which you want to connect to the server
     port = 50007
-    localhost_addr = '192.64.4.4'
+    localhost_addr = '8.7.45.2'
 
     # connect to the server on local machine
     server_binding = (localhost_addr, port)
