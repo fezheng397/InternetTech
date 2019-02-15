@@ -1,7 +1,7 @@
 import threading
 import time
 import random
-import os
+import sys, os
 import socket
 
 def client():
@@ -14,7 +14,7 @@ def client():
         
     # Define the port on which you want to connect to the server
     port = 50007
-    localhost_addr = '8.7.45.2'
+    localhost_addr = socket.gethostbyname(socket.gethostname())
 
     # connect to the server on local machine
     server_binding = (localhost_addr, port)
@@ -35,6 +35,10 @@ def client():
     exit()
 
 if __name__ == "__main__":
+
+    if (len(sys.argv) is not 3 or not sys.argv[2].isdigit()):
+        print("Error: IMPROPER SYNTAX")
+        sys.exit(0)
 
     time.sleep(random.random() * 5)
     t2 = threading.Thread(name='client', target=client)
