@@ -1,7 +1,7 @@
 import threading
 import time
 import random
-
+import sys
 import socket
 
 def server():
@@ -12,7 +12,7 @@ def server():
         print('socket open error: {}\n'.format(err))
         exit()
 
-    server_binding = ('', 50008)
+    server_binding = ('', 50007)
     ss.bind(server_binding)
     ss.listen(1)
     host = socket.gethostname()
@@ -43,3 +43,5 @@ if __name__ == "__main__":
 
     time.sleep(5)
     print("Done.")
+    
+    sys.exit(0)

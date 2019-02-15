@@ -1,7 +1,7 @@
 import threading
 import time
 import random
-
+import os
 import socket
 
 def client():
@@ -13,8 +13,8 @@ def client():
         exit()
         
     # Define the port on which you want to connect to the server
-    port = 50008
-    localhost_addr = socket.gethostbyname(socket.gethostname())
+    port = 50007
+    localhost_addr = '192.64.4.4'
 
     # connect to the server on local machine
     server_binding = (localhost_addr, port)
@@ -40,5 +40,7 @@ if __name__ == "__main__":
     t2 = threading.Thread(name='client', target=client)
     t2.start()
 
-    time.sleep(5)
+    time.sleep(15)
     print("Done.")
+    #Exit program
+    os._exit(0)

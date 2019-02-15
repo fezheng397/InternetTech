@@ -1,7 +1,7 @@
 import threading
 import time
 import random
-
+import sys
 import socket
 
 def server():
@@ -43,3 +43,5 @@ if __name__ == "__main__":
 
     time.sleep(5)
     print("Done.")
+    #Exit program
+    sys.exit(0)
