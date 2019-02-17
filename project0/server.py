@@ -13,7 +13,7 @@ def server(rsListenPort):
         print('socket open error: {}\n'.format(err))
         exit()
 
-    server_binding = ('', 50007)
+    server_binding = (socket.gethostbyname(socket.gethostname()), int(rsListenPort))
     ss.bind(server_binding)
     ss.listen(1)
     host = socket.gethostname()
@@ -41,12 +41,12 @@ def reverse(msg):
 if __name__ == "__main__":
     if(not sys.argv[1].isdigit()):
         print("Please enter an integer hostname")
-        os.exit(0)
+        sys.exit(0)
     
     t1 = threading.Thread(name='server', target=server, args=([sys.argv[1]]))
     t1.start()
 
-    time.sleep(5)
+    time.sleep(30)
     print("Done.")
     #Exit program
     os._exit(0)
