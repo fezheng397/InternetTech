@@ -4,7 +4,7 @@ import random
 import sys, os
 import socket
 
-def client(rsHostName, rsListenPort):
+def client(rsHostName, rsListenPort, hostNames):
     try:
         cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print("[C]: Client socket created")
@@ -20,23 +20,22 @@ def client(rsHostName, rsListenPort):
     server_binding = (localhost_addr, port)
     cs.connect(server_binding)
 
-    while True:
-    # Send data to the server
-    msg_snt = 'PALINDROME_TEST_STRING'
-    data_to_server=cs.send(msg_snt.encode('utf-8'))
-    print("[C]: Data sent to server: {}".format(msg_snt))
+    for host in hostNames: 
+      # Send data to the server
+      data_to_server=cs.send(host.encode('utf-8'))
+      print("[C]: Data sent to server: {}".format(host))
 
-	#Receive data from the server
-    data_from_server=cs.recv(100)
-    msg_rcv = data_from_server.decode('utf-8')
-    print("[C]: Data received from server: {}".format(msg_rcv))
+	    #Receive data from the server
+      data_from_server=cs.recv(100)
+      msg_rcv = data_from_server.decode('utf-8')
+      print("[C]: Data received from server: {}".format(msg_rcv))
 
     # close the client socket
     cs.close()
     exit()
     
 def getAllHostNamesFromFile():
-    fileName = open('in-proj0.txt')
+    fileName = open('PROJI-HNS.txt')
     hostNames = []
     for line in fileName.readlines():
         hostNames.append(line.rstrip())

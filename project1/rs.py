@@ -38,7 +38,8 @@ def server(rsListenPort):
         data_from_server=csockid.recv(200)
         print("[C]: Data received from client: {}".format(data_from_server.decode('utf-8')))
         if not data_from_server or data_from_server == 'END':
-            print("Data from server: " + data_from_server)
+            print("[S]: Data from client: " + data_from_server)
+            csockid.send('END'.encode('utf-8'))
             break
         
         # Send reversed string
