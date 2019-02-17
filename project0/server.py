@@ -5,6 +5,7 @@ import sys, os
 import socket
 
 def server(rsListenPort):
+<<<<<<< HEAD
     print(rsListenPort)
 
     try:
@@ -45,10 +46,38 @@ def server(rsListenPort):
             msg = reverse(data_from_server.decode('utf-8'))
             csockid.send(msg.encode('utf-8'))
         
+=======
 
-    # Close the server socket
-    ss.close()
-    exit()
+    while True:
+      try:
+          ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+          print("[S]: Server socket created")
+      except socket.error as err:
+          print('socket open error: {}\n'.format(err))
+          exit()
+
+      server_binding = (socket.gethostbyname(socket.gethostname()), int(rsListenPort))
+      ss.bind(server_binding)
+      ss.listen(1)
+      host = socket.gethostname()
+      print("[S]: Server host name is {}".format(host))
+      localhost_ip = (socket.gethostbyname(host))
+      print("[S]: Server IP address is {}".format(localhost_ip))
+      csockid, addr = ss.accept()
+      print ("[S]: Got a connection request from a client at {}".format(addr))
+      
+      # Receive client msg
+      data_from_server=csockid.recv(100)
+      print("[C]: Data received from client: {}".format(data_from_server.decode('utf-8')))
+      
+      # Send reversed string
+      msg = reverse(data_from_server.decode('utf-8'))
+      csockid.send(msg.encode('utf-8'))
+>>>>>>> a2ec7110457deb0e8f68e9f31f4ed13288e03610
+
+      # Close the server socket
+      ss.close()
+      exit()
 
 def reverse(msg):
 	return msg[::-1]

@@ -33,13 +33,27 @@ def client(rsHostName, rsListenPort):
     # close the client socket
     cs.close()
     exit()
+    
+def getAllHostNamesFromFile():
+    fileName = open('in-proj0.txt')
+    hostNames = []
+    for line in fileName.readlines():
+        hostNames.append(line.rstrip())
+    hostNames.append('END')
+    fileName.close()
+    return hostNames
 
 if __name__ == "__main__":
 
     if (len(sys.argv) is not 3 or not sys.argv[2].isdigit()):
-        print("Please enter valid parameter syntax ")
+        print("Please enter valid parameter syntax")
         sys.exit(0)
+        
 
+    hostNames = getAllHostNamesFromFile()
+    for line in hostNames:
+      print(line)
+    
     time.sleep(random.random() * 5)
     t2 = threading.Thread(name='client', target=client, args=([sys.argv[1], sys.argv[2]]))
     t2.start()
@@ -47,4 +61,5 @@ if __name__ == "__main__":
     time.sleep(15)
     print("Done.")
     #Exit program
+    sys.exit(0)
     os._exit(0)
