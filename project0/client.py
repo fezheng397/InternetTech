@@ -4,7 +4,7 @@ import random
 import sys, os
 import socket
 
-def client():
+def client(rsHostName, rsListenPort):
     try:
         cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print("[C]: Client socket created")
@@ -13,9 +13,8 @@ def client():
         exit()
         
     # Define the port on which you want to connect to the server
-    port = 50007
-    localhost_addr = '165.230.224.172'
-    #socket.gethostbyname(socket.gethostname())
+    port = int(rsListenPort)
+    localhost_addr = rsHostName
 
     # connect to the server on local machine
     server_binding = (localhost_addr, port)
@@ -37,15 +36,15 @@ def client():
 
 if __name__ == "__main__":
 
-    #if (len(sys.argv) is not 3 or not sys.argv[2].isdigit()):
-    #    print("Error: IMPROPER SYNTAX")
-    #    sys.exit(0)
+    if (len(sys.argv) is not 3 or not sys.argv[2].isdigit()):
+        print("Please enter valid parameter syntax ")
+        sys.exit(0)
 
     time.sleep(random.random() * 5)
-    t2 = threading.Thread(name='client', target=client)
+    t2 = threading.Thread(name='client', target=client, args=([sys.argv[1], sys.argv[2]]))
     t2.start()
 
-    time.sleep(30)
+    time.sleep(15)
     print("Done.")
     #Exit program
     os._exit(0)
