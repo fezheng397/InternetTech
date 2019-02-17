@@ -32,18 +32,18 @@ def server(rsListenPort):
     '''
     filename = 'PROJI-DNSRS.txt'
     file = open(filename, 'r')
-
+    
     while True:
         # Receive client msg
         data_from_server=csockid.recv(200)
         print("[C]: Data received from client: {}".format(data_from_server.decode('utf-8')))
-        if not data_from_server:
+        if not data_from_server or data_from_server == 'END':
+            print("Data from server: " + data_from_server)
             break
-            if data_from_server == 'END':
-                break
-            # Send reversed string
-            msg = reverse(data_from_server.decode('utf-8'))
-            csockid.send(msg.encode('utf-8'))
+        
+        # Send reversed string
+        msg = reverse(data_from_server.decode('utf-8'))
+        csockid.send(msg.encode('utf-8'))
         
 
     # Close the server socket
