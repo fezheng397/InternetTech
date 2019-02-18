@@ -35,7 +35,7 @@ def client(rsHostName, rsListenPort, hostNames):
     exit()
     
 def getAllHostNamesFromFile():
-    fileName = open('in-proj0.txt')
+    fileName = open('PROJI-HNS.txt')
     hostNames = []
     for line in fileName.readlines():
         hostNames.append(line.rstrip())
