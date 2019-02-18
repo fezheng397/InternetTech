@@ -4,8 +4,8 @@ import random
 import sys, os
 import socket
 
-def server(rsListenPort, rsConnections, tsHostname):
-    print(rsListenPort)
+def server(tsListenPort, tsConnections):
+    print(tsListenPort)
 
     try:
         ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -14,7 +14,7 @@ def server(rsListenPort, rsConnections, tsHostname):
         print('socket open error: {}\n'.format(err))
         exit()
 
-    server_binding = (socket.gethostbyname(socket.gethostname()), int(rsListenPort))
+    server_binding = (socket.gethostbyname(socket.gethostname()), int(tsListenPort))
     ss.bind(server_binding)
     ss.listen(1)
     host = socket.gethostname()
@@ -37,13 +37,13 @@ def server(rsListenPort, rsConnections, tsHostname):
 
         # Response section
         #if hostname is in hashtable, connection is in RS. if not, redirect to tS
-        connectionValues = rsConnections.get(data_from_server)
+        connectionValues = tsConnections.get(data_from_server)
         #print(connectionValues)
         msg = ''
         if connectionValues != None:
             msg = data_from_server + ' ' + connectionValues[0] + ' ' + connectionValues[1]
         else:
-            msg = tsHostname
+            msg = data_from_server + ' - Error:HOST NOT FOUND'
         csockid.send(msg.encode('utf-8'))
         
 
@@ -62,17 +62,13 @@ def readFile(filename):
     filename.close()
     return fileContent
 
-def createConnections(rsConnections, fileContent):
-    contentLength = len(fileContent)
-    tsHostname = fileContent[contentLength - 1]
-    fileContent = fileContent[:(contentLength - 1)]
+def createConnections(tsConnections, fileContent):
     for connection in fileContent:
         substrings = connection.split(' ')
         #print substrings
-        rsConnections[substrings[0]] = (substrings[1], substrings[2])
+        tsConnections[substrings[0]] = (substrings[1], substrings[2])
     
-    #print rsConnections
-    return tsHostname
+    #print tsConnections
 
 
 if __name__ == "__main__":
@@ -87,16 +83,16 @@ if __name__ == "__main__":
                 Key: Hostname
                 Value: Tuple containing (IP Address, String)
     '''
-    filename = open('PROJI-DNSRS.txt')
-    DNSRSContent = readFile(filename)
+    filename = open('PROJI-DNSTS.txt')
+    DNSTSContent = readFile(filename)
     #print DNSRSContent
 
-    rsConnections = {}
+    tsConnections = {}
 
-    tsHostname = createConnections(rsConnections, DNSRSContent)
-    print rsConnections
+    createConnections(tsConnections, DNSTSContent)
     
-    t1 = threading.Thread(name='server', target=server, args=(sys.argv[1], rsConnections, tsHostname))
+
+    t1 = threading.Thread(name='server', target=server, args=(sys.argv[1], tsConnections))
     t1.start()
 
     time.sleep(20)
