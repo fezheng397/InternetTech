@@ -99,7 +99,7 @@ if __name__ == "__main__":
     t1 = threading.Thread(name='server', target=server, args=(sys.argv[1], rsConnections, tsHostname))
     t1.start()
 
-    time.sleep(20)
+    time.sleep(30)
     print("Done.")
     
     #Exit program
