@@ -5,6 +5,7 @@ import sys, os
 import socket
 
 def client(rsHostName, rsListenPort, hostNames, rsConnection):
+    output = open("RESOLVED.txt", "a+")
     try:
         cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print("[C]: Client socket created")
@@ -22,15 +23,15 @@ def client(rsHostName, rsListenPort, hostNames, rsConnection):
     
     # send and receive data
     if rsConnection:
-        interpretRSConnection(cs, hostNames)
+        interpretRSConnection(cs, hostNames, output)
         # close the client socket
         cs.close()
         exit()
     else:
-        outputResults(cs, hostNames)
+        outputResults(cs, hostNames, output)
 
     
-def interpretRSConnection(cs, hostNames):
+def interpretRSConnection(cs, hostNames, output):
     for host in hostNames: 
         # Send data to the server
         data_to_server=cs.send(host.encode('utf-8'))
@@ -49,8 +50,10 @@ def interpretRSConnection(cs, hostNames):
             tsHostName = msg_rcv[:-5]
             print("TS Port Num: " + str(sys.argv[3]))
             client(tsHostName, sys.argv[3], [host], False)
-            
-def outputResults(cs, hostNames):
+        else:
+            output.write(format(msg_rcv))
+
+def outputResults(cs, hostNames, output):
     for host in hostNames: 
         # Send data to the server
         data_to_server=cs.send(host.encode('utf-8'))
@@ -60,10 +63,11 @@ def outputResults(cs, hostNames):
         data_from_server=cs.recv(100)
         msg_rcv = data_from_server.decode('utf-8')
         print("[C]: Data received from TServer: {}".format(msg_rcv))
-        
+        output.write(format(msg_rcv))
     cs.close()
     #exit()
-    
+
+
 def getAllHostNamesFromFile():
     fileName = open('PROJI-HNS.txt')
     hostNames = []
