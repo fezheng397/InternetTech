@@ -23,43 +23,46 @@ def client(rsHostName, rsListenPort, hostNames, rsConnection):
     # send and receive data
     if rsConnection:
         interpretRSConnection(cs, hostNames)
+        # close the client socket
+        cs.close()
+        exit()
     else:
         outputResults(cs, hostNames)
-    
-    # close the client socket
-    cs.close()
-    exit()
+
     
 def interpretRSConnection(cs, hostNames):
     for host in hostNames: 
         # Send data to the server
         data_to_server=cs.send(host.encode('utf-8'))
-        print("[C]: Data sent to server: {}".format(host))
+        print("[C]: Data sent to RServer: {}".format(host))
 
 	      #Receive data from the server
         data_from_server=cs.recv(100)
         msg_rcv = data_from_server.decode('utf-8')
-        print("[C]: Data received from server: {}".format(msg_rcv))
-        if msg_rcv is 'END':
+        print("[C]: Data received from RServer: {}".format(msg_rcv))
+        if msg_rcv == 'END':
+            print("Close TS")
+            client(tsHostName, sys.argv[3], ['END'], False)
             break
         elif msg_rcv[-2:] == 'NS':
             print(msg_rcv[:-5])
             tsHostName = msg_rcv[:-5]
-            client(tsHostName, sys.argv[3], [host, 'END'], False)
+            print("TS Port Num: " + str(sys.argv[3]))
+            client(tsHostName, sys.argv[3], [host], False)
             
 def outputResults(cs, hostNames):
     for host in hostNames: 
         # Send data to the server
         data_to_server=cs.send(host.encode('utf-8'))
-        print("[C]: Data sent to server: {}".format(host))
+        print("[C]: Data sent to TServer: {}".format(host))
 
 	      #Receive data from the server
         data_from_server=cs.recv(100)
         msg_rcv = data_from_server.decode('utf-8')
-        print("[C]: Data received from server: {}".format(msg_rcv))
+        print("[C]: Data received from TServer: {}".format(msg_rcv))
         
     cs.close()
-    exit()
+    #exit()
     
 def getAllHostNamesFromFile():
     fileName = open('PROJI-HNS.txt')
