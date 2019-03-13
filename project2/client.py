@@ -27,44 +27,18 @@ def client(rsHostName, rsListenPort, hostNames, rsConnection):
         exit()
         
     # send and receive data
-    if rsConnection:
-        interpretRSConnection(cs, hostNames)
-        # close the client socket
-        try:
-            os.remove('RESOLVED.txt')
-        except OSError:
-            pass
-        output = open("RESOLVED.txt", "a+")
-        print(outputString)
-        output.write(outputString)
-        output.close()
-        cs.close()
-        exit()
-    else:
-        outputResults(cs, hostNames)
-    
-def interpretRSConnection(cs, hostNames):
-    global outputString
-    for host in hostNames: 
-        # Send data to the server
-        data_to_server=cs.send(host.encode('utf-8'))
-        print("[C]: Data sent to RServer: {}".format(host))
-
-	      #Receive data from the server
-        data_from_server=cs.recv(100)
-        msg_rcv = data_from_server.decode('utf-8')
-        print("[C]: Data received from RServer: {}".format(msg_rcv))
-        if msg_rcv == 'END':
-            print("Close TS")
-            client(tsHostName, sys.argv[3], ['END'], False)
-            break
-        elif msg_rcv[-2:] == 'NS':
-            print(msg_rcv[:-5])
-            tsHostName = msg_rcv[:-5]
-            print("TS Port Num: " + str(sys.argv[3]))
-            client(tsHostName, sys.argv[3], [host], False)
-        else:
-            outputString = outputString + format(msg_rcv) + '\n'
+    outputResults(cs, hostNames)
+    # close the client socket
+    try:
+        os.remove('RESOLVED.txt')
+    except OSError:
+        pass
+    output = open("RESOLVED.txt", "a+")
+    print(outputString)
+    output.write(outputString)
+    output.close()
+    cs.close()
+    exit()
 
 def outputResults(cs, hostNames):
     global outputString
@@ -85,7 +59,7 @@ def outputResults(cs, hostNames):
 
 
 def getAllHostNamesFromFile():
-    fileName = open('PROJI-HNS.txt')
+    fileName = open('PROJI2-HNS.txt')
     hostNames = []
     for line in fileName.readlines():
         hostNames.append(line.rstrip())
@@ -96,14 +70,14 @@ def getAllHostNamesFromFile():
 if __name__ == "__main__":
     global outputString
     outputString = ''
-    if (len(sys.argv) is not 4 or not sys.argv[2].isdigit() or not sys.argv[3].isdigit()):
+    if (len(sys.argv) is not 3 or not sys.argv[2].isdigit()):
         print("Please enter valid parameter syntax")
         sys.exit(0)
         
     hostNames = getAllHostNamesFromFile()
   
     time.sleep(random.random() * 5)
-    t2 = threading.Thread(name='client', target=client, args=([sys.argv[1], sys.argv[2], hostNames, True]))
+    t2 = threading.Thread(name='client', target=client, args=([sys.argv[1], sys.argv[2], hostNames]))
     t2.start()
 
     time.sleep(15)
