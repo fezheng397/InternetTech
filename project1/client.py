@@ -19,8 +19,13 @@ def client(rsHostName, rsListenPort, hostNames, rsConnection):
 
     # connect to the server on local machine
     server_binding = (localhost_addr, port)
-    cs.connect(server_binding)
-    
+    try:
+        cs.connect(server_binding)
+    except Exception as e:
+        print(e)
+        cs.close()
+        exit()
+        
     # send and receive data
     if rsConnection:
         interpretRSConnection(cs, hostNames)
