@@ -4,7 +4,7 @@ import random
 import sys, os
 import socket
 
-def client(rsHostName, rsListenPort, hostNames, rsConnection):
+def client(rsHostName, rsListenPort, hostNames):
     global outputString
     try:
         cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -33,6 +33,7 @@ def client(rsHostName, rsListenPort, hostNames, rsConnection):
         os.remove('RESOLVED.txt')
     except OSError:
         pass
+        
     output = open("RESOLVED.txt", "a+")
     print(outputString)
     output.write(outputString)
@@ -54,12 +55,10 @@ def outputResults(cs, hostNames):
         
         if (not(format(msg_rcv) == 'END')):
             outputString = outputString + format(msg_rcv) + '\n'
-    cs.close()
-    #exit()
 
 
 def getAllHostNamesFromFile():
-    fileName = open('PROJI2-HNS.txt')
+    fileName = open('PROJ2-HNS.txt')
     hostNames = []
     for line in fileName.readlines():
         hostNames.append(line.rstrip())

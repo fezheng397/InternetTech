@@ -89,7 +89,7 @@ if __name__ == "__main__":
                 Key: Hostname
                 Value: Tuple containing (IP Address, String)
     '''
-    filename = open('PROJI-DNSRS.txt')
+    filename = open('PROJ2-DNSRS.txt')
     DNSRSContent = readFile(filename)
     #print DNSRSContent
 
