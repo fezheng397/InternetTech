@@ -32,6 +32,8 @@ def server(rsListenPort, rsConnections, tsHostname, tsEduListenPort, tsComListen
         print("[C]: Data received from client: {}".format(data_from_server.decode('utf-8')))
         if not data_from_server or data_from_server == 'END':
             print("[S]: Data from client: " + data_from_server)
+            msg = clientTS(rsConnections.get('tsCom')[0], tsComListenPort, 'END')
+            msg = clientTS(rsConnections.get('tsEdu')[0], tsEduListenPort, 'END')
             csockid.send('END'.encode('utf-8'))
             break
         
@@ -51,13 +53,13 @@ def server(rsListenPort, rsConnections, tsHostname, tsEduListenPort, tsComListen
             tempLen = len(temp)
             #If end block is com - direct to tsCOM
             if temp[tempLen - 1] == 'com':
-                print 'com'
-                clientTS(rsConnections.get('tsCom'), tsComListenPort, data_from_server, msg)
+                #print data_from_server
+                msg = clientTS(rsConnections.get('tsCom')[0], tsComListenPort, data_from_server)
                 #msg = 'tsCOM'
             #else if end block is edu - direct to tsEDU
             elif temp[tempLen - 1] == 'edu':
-                print 'edu'
-                clientTS(rsConnections.get('tsEdu'), tsEduListenPort, data_from_server, msg)
+                #print data_from_server
+                msg = clientTS(rsConnections.get('tsEdu')[0], tsEduListenPort, data_from_server)
                 #msg = 'tsEDU'
             #else return error msg
             else:
@@ -70,16 +72,16 @@ def server(rsListenPort, rsConnections, tsHostname, tsEduListenPort, tsComListen
     ss.close()
     exit()
 
-def clientTS(tsHostName, tsListenPort, hostname, msg_rcv):
+def clientTS(tsHostName, tsListenPort, hostname):
     try:
         cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print("[C]: Client socket created")
+        print("[C]: ClientTS socket created")
     except socket.error as err:
         print('socket open error: {} \n'.format(err))
         exit()
         
     # Define the port on which you want to connect to the server
-    port = int(rsListenPort)
+    port = int(tsListenPort)
     localhost_addr = tsHostName
 
     # connect to the server on local machine
@@ -93,8 +95,9 @@ def clientTS(tsHostName, tsListenPort, hostname, msg_rcv):
         
     # send and receive data
     # Send data to the server
+    #print('Sending data to tsServer"')
     data_to_server=cs.send(hostname.encode('utf-8'))
-    print("[C]: Data sent to TServer: {}".format(host))
+    print("[C]: Data sent to TServer: {}".format(hostname))
 
         #Receive data from the server
     data_from_server=cs.recv(100)
@@ -103,7 +106,7 @@ def clientTS(tsHostName, tsListenPort, hostname, msg_rcv):
     
     # close the client socket
     cs.close()
-    exit()
+    return msg_rcv
 
 
 def readFile(filename):
