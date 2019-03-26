@@ -48,11 +48,8 @@ def server(tsListenPort, tsConnections):
         
 
     # Close the server socket
-    print("TS socket closed: " +  str(ss.close()))
+    print("TS Com socket closed: " +  str(ss.close()))
     exit()
-
-def reverse(msg):
-	return msg[::-1]
 
 def readFile(filename):
     fileContent = []
@@ -95,7 +92,7 @@ if __name__ == "__main__":
     t1 = threading.Thread(name='server', target=server, args=(sys.argv[1], tsConnections))
     t1.start()
 
-    time.sleep(15)
+    time.sleep(20)
     print("Done.")
     
     #Exit program

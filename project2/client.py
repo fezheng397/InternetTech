@@ -35,7 +35,7 @@ def client(rsHostName, rsListenPort, hostNames):
         pass
         
     output = open("RESOLVED.txt", "a+")
-    print(outputString)
+    #print(outputString)
     output.write(outputString)
     output.close()
     cs.close()
@@ -79,7 +79,7 @@ if __name__ == "__main__":
     t2 = threading.Thread(name='client', target=client, args=([sys.argv[1], sys.argv[2], hostNames]))
     t2.start()
 
-    time.sleep(15)
+    time.sleep(20)
     print("Done.")
     #Exit program
     sys.exit(0)
