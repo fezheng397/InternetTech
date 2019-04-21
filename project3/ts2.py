@@ -3,8 +3,9 @@ import time
 import random
 import sys, os
 import socket
+import hmac
 
-def server(tsListenPort, tsConnections):
+def server(tsListenPort, tsConnections, key):
     print(tsListenPort)
 
     try:
@@ -32,6 +33,13 @@ def server(tsListenPort, tsConnections):
             print("[S]: Data from client: " + data_from_server)
             csockid.send('END'.encode('utf-8'))
             break
+        else if len(data_from_server.split('.')) > 1:
+            #Create and send back digest
+            digest_query = hmac.new(key.encode("utf-8"), data_from_server.encode("utf-8"))
+            print digest_query
+            print digest_query.hexdigest()
+            csockid.send(digest_query.hexdigest())
+            continue
         
         data_from_server = data_from_server.lower()
 
@@ -80,8 +88,10 @@ if __name__ == "__main__":
                 Key: Hostname
                 Value: Tuple containing (IP Address, String)
     '''
-    filename = open('PROJ2-DNSTSedu.txt')
+    filename = open('PROJ3-DNSTS2.txt')
+    keyFilename = open('PROJ3-KEY2.txt')
     DNSTSContent = readFile(filename)
+    keyContent = readFile(keyFilename)[0]
     #print DNSRSContent
 
     tsConnections = {}
@@ -89,7 +99,7 @@ if __name__ == "__main__":
     createConnections(tsConnections, DNSTSContent)
     
 
-    t1 = threading.Thread(name='server', target=server, args=(sys.argv[1], tsConnections))
+    t1 = threading.Thread(name='server', target=server, args=(sys.argv[1], tsConnections, keyContent))
     t1.start()
 
     time.sleep(20)

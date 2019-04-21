@@ -3,9 +3,9 @@ import time
 import random
 import sys, os
 import socket
-
-def server(rsListenPort, rsConnections, tsHostname, tsEduListenPort, tsComListenPort):
-    print(rsListenPort)
+asListenPort, ts1Hostname, ts1ListenPort_a, ts2Hosname, ts2ListenPort_a
+def server(asListenPort, ts1Hostname, ts1ListenPort_a, , ts2Hostname, ts2ListenPort_a):
+    print(asListenPort)
 
     try:
         ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -14,7 +14,7 @@ def server(rsListenPort, rsConnections, tsHostname, tsEduListenPort, tsComListen
         print('socket open error: {}\n'.format(err))
         exit()
 
-    server_binding = (socket.gethostbyname(socket.gethostname()), int(rsListenPort))
+    server_binding = (socket.gethostbyname(socket.gethostname()), int(asListenPort))
     ss.bind(server_binding)
     ss.listen(1)
     host = socket.gethostname()
@@ -32,33 +32,23 @@ def server(rsListenPort, rsConnections, tsHostname, tsEduListenPort, tsComListen
         print("[C]: Data received from client: {}".format(data_from_server.decode('utf-8')))
         if not data_from_server or data_from_server == 'END':
             print("[S]: Data from client: " + data_from_server)
-            msg = clientTS(rsConnections.get('tsCom')[0], tsComListenPort, 'END')
-            msg = clientTS(rsConnections.get('tsEdu')[0], tsEduListenPort, 'END')
+            msg = clientTS(ts1Hostname, ts1ListenPort_a, 'END')
+            msg = clientTS(ts2Hostname, ts2ListenPort_a, 'END')
             csockid.send('END'.encode('utf-8'))
             break
         
-        data_from_server = data_from_server.lower()
-
-        # Response section
-        #if hostname is in hashtable, connection is in RS. if not, redirect to tS
-        connectionValues = rsConnections.get(data_from_server)
-        #print(connectionValues)
-        msg = ''
-        if connectionValues != None:
-            msg = data_from_server + ' ' + connectionValues[0] + ' ' + connectionValues[1]
+        data_from_server = data_from_server.split(' ')
+        challengeStr = data_from_server[0]
+        digest = data_from_server[1]
+        
+        ts1Res = clientTS(ts1Hostname, ts1ListenPort_a, challengeStr)
+        ts2Res = clientTS(ts2Hostname, ts2ListenPort_a, challengeStr)
+        if(ts1Res == digest):
+            msg = ts1Hostname
+        else if(ts2Res == digest):
+            msg = ts2Hostname
         else:
-            #Check for data_from_server ending block
-            temp = data_from_server.split('.')
-            tempLen = len(temp)
-            #If end block is com - direct to tsCOM
-            if temp[tempLen - 1] == 'com':
-                msg = clientTS(rsConnections.get('tsCom')[0], tsComListenPort, data_from_server)
-            #else if end block is edu - direct to tsEDU
-            elif temp[tempLen - 1] == 'edu':
-                msg = clientTS(rsConnections.get('tsEdu')[0], tsEduListenPort, data_from_server)
-            #else return error msg
-            else:
-                msg = data_from_server + ' - Error:HOST NOT FOUND'
+            msg = 'Hostname - Error:HOST NOT FOUND'
 
         csockid.send(msg.encode('utf-8'))
         
@@ -118,10 +108,10 @@ def createConnections(rsConnections, fileContent):
             #print (temp)
             if(temp[len(temp) - 1] == 'com'):
                 #add TSCOM to rsConnections
-                rsConnections['tsCom'] = (substrings[1], substrings[2])
+                rsConnections['ts1'] = (substrings[1], substrings[2])
             else:
                 #add TSEDU to rsConnections
-                rsConnections['tsEdu'] = (substrings[1], substrings[2])
+                rsConnections['ts2'] = (substrings[1], substrings[2])
         else:
             #print substrings
             rsConnections[substrings[0]] = (substrings[1], substrings[2])
@@ -150,8 +140,12 @@ if __name__ == "__main__":
 
     tsHostname = createConnections(rsConnections, DNSRSContent)
     print rsConnections
-
-    t1 = threading.Thread(name='server', target=server, args=(sys.argv[1], rsConnections, tsHostname, sys.argv[2], sys.argv[3]))
+    asListenPort = sys.argv[0]
+    ts1Hostname = sys.argv[1]
+    ts1ListenPort_a = sys.argv[2]
+    ts2Hosname = sys.argv[3]
+    ts2ListenPort_a = sys.argv[4]
+    t1 = threading.Thread(name='server', target=server, args=(asListenPort, ts1Hostname, ts1ListenPort_a, ts2Hosname, ts2ListenPort_a))
     t1.start()
 
     time.sleep(20)
