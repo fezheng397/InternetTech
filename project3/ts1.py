@@ -29,11 +29,12 @@ def server(tsListenPort, tsConnections, key):
         # Receive client msg
         data_from_server=csockid.recv(200)
         print("[C]: Data received from client: {}".format(data_from_server.decode('utf-8')))
+        test = data_from_server.split('.')
         if not data_from_server or data_from_server == 'END':
             print("[S]: Data from client: " + data_from_server)
             csockid.send('END'.encode('utf-8'))
             break
-        else if len(data_from_server.split('.')) > 1:
+        elif len(test) == 1:
             #Create and send back digest
             digest_query = hmac.new(key.encode("utf-8"), data_from_server.encode("utf-8"))
             print digest_query

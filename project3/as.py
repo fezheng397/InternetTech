@@ -3,8 +3,8 @@ import time
 import random
 import sys, os
 import socket
-asListenPort, ts1Hostname, ts1ListenPort_a, ts2Hosname, ts2ListenPort_a
-def server(asListenPort, ts1Hostname, ts1ListenPort_a, , ts2Hostname, ts2ListenPort_a):
+
+def server(asListenPort, ts1Hostname, ts1ListenPort_a, ts2Hostname, ts2ListenPort_a):
     print(asListenPort)
 
     try:
@@ -32,8 +32,8 @@ def server(asListenPort, ts1Hostname, ts1ListenPort_a, , ts2Hostname, ts2ListenP
         print("[C]: Data received from client: {}".format(data_from_server.decode('utf-8')))
         if not data_from_server or data_from_server == 'END':
             print("[S]: Data from client: " + data_from_server)
-            msg = clientTS(ts1Hostname, ts1ListenPort_a, 'END')
-            msg = clientTS(ts2Hostname, ts2ListenPort_a, 'END')
+            #msg = clientTS(ts1Hostname, ts1ListenPort_a, 'END')
+            #msg = clientTS(ts2Hostname, ts2ListenPort_a, 'END')
             csockid.send('END'.encode('utf-8'))
             break
         
@@ -44,9 +44,9 @@ def server(asListenPort, ts1Hostname, ts1ListenPort_a, , ts2Hostname, ts2ListenP
         ts1Res = clientTS(ts1Hostname, ts1ListenPort_a, challengeStr)
         ts2Res = clientTS(ts2Hostname, ts2ListenPort_a, challengeStr)
         if(ts1Res == digest):
-            msg = ts1Hostname
-        else if(ts2Res == digest):
-            msg = ts2Hostname
+            msg = "TS1 " + ts1Hostname
+        elif(ts2Res == digest):
+            msg = "TS2 " + ts2Hostname
         else:
             msg = 'Hostname - Error:HOST NOT FOUND'
 
@@ -132,19 +132,13 @@ if __name__ == "__main__":
                 Key: Hostname
                 Value: Tuple containing (IP Address, String)
     '''
-    filename = open('PROJ2-DNSRS.txt')
-    DNSRSContent = readFile(filename)
     #print DNSRSContent
 
-    rsConnections = {}
-
-    tsHostname = createConnections(rsConnections, DNSRSContent)
-    print rsConnections
-    asListenPort = sys.argv[0]
-    ts1Hostname = sys.argv[1]
-    ts1ListenPort_a = sys.argv[2]
-    ts2Hosname = sys.argv[3]
-    ts2ListenPort_a = sys.argv[4]
+    asListenPort = sys.argv[1]
+    ts1Hostname = sys.argv[2]
+    ts1ListenPort_a = sys.argv[3]
+    ts2Hosname = sys.argv[4]
+    ts2ListenPort_a = sys.argv[5]
     t1 = threading.Thread(name='server', target=server, args=(asListenPort, ts1Hostname, ts1ListenPort_a, ts2Hosname, ts2ListenPort_a))
     t1.start()
 
