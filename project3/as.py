@@ -32,8 +32,8 @@ def server(asListenPort, ts1Hostname, ts1ListenPort_a, ts2Hostname, ts2ListenPor
         print("[C]: Data received from client: {}".format(data_from_server.decode('utf-8')))
         if not data_from_server or data_from_server == 'END':
             print("[S]: Data from client: " + data_from_server)
-            #msg = clientTS(ts1Hostname, ts1ListenPort_a, 'END')
-            #msg = clientTS(ts2Hostname, ts2ListenPort_a, 'END')
+            msg = clientTS(ts1Hostname, ts1ListenPort_a, 'END')
+            msg = clientTS(ts2Hostname, ts2ListenPort_a, 'END')
             csockid.send('END'.encode('utf-8'))
             break
         
