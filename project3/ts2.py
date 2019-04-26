@@ -15,10 +15,10 @@ def server(tsListenPort, tsConnections, key):
         exit()
 
     server_binding = (socket.gethostbyname(socket.gethostname()), int(tsListenPort))
-    print("[S]: Server binding is {}".format(str(server_binding)))
+    #print("[S]: Server binding is {}".format(str(server_binding)))
     ss.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    print("[S]: Server bind is " + str(ss.bind(server_binding)))
-    print("[S]: Server listen is " + str(ss.listen(5)))
+    #print("[S]: Server bind is " + str(ss.bind(server_binding)))
+    #print("[S]: Server listen is " + str(ss.listen(5)))
     host = socket.gethostname()
     print("[S]: Server host name is {}".format(host))
     localhost_ip = (socket.gethostbyname(host))
@@ -145,7 +145,7 @@ if __name__ == "__main__":
     t2 = threading.Thread(name='C_server', target=server, args=(clientListenPort, tsConnections, keyContent))
     t2.start()
 
-    time.sleep(25)
+    time.sleep(30)
     print("Done.")
     
     #Exit program
