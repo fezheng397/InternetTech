@@ -11,7 +11,7 @@ def server(asListenPort, ts1Hostname, ts1ListenPort_a, ts2Hostname, ts2ListenPor
         ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print("[S]: Server socket created")
     except socket.error as err:
-        print('socket open error: {}\n'.format(err))
+        print('[ERROR]: Socket open error: {} \n'.format(err))
         exit()
 
     server_binding = (socket.gethostbyname(socket.gethostname()), int(asListenPort))
@@ -29,7 +29,7 @@ def server(asListenPort, ts1Hostname, ts1ListenPort_a, ts2Hostname, ts2ListenPor
         #print ("Count: " + str(count))
         # Receive client msg
         data_from_server=csockid.recv(200)
-        print("[C]: Data received from client: {}".format(data_from_server.decode('utf-8')))
+        print("[S]: Data received from client: {}".format(data_from_server.decode('utf-8')))
         if not data_from_server or data_from_server == 'END':
             print("[S]: Data from client: " + data_from_server)
             msg = clientTS(ts1Hostname, ts1ListenPort_a, 'END')
@@ -62,7 +62,7 @@ def clientTS(tsHostName, tsListenPort, hostname):
         cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print("[C]: ClientTS socket created")
     except socket.error as err:
-        print('socket open error: {} \n'.format(err))
+        print('[ERROR]: Socket open error: {} \n'.format(err))
         exit()
         
     # Define the port on which you want to connect to the server
@@ -122,7 +122,7 @@ def createConnections(rsConnections, fileContent):
 
 if __name__ == "__main__":
     if(not sys.argv[1].isdigit()):
-        print("Please enter an integer hostname")
+        print("[ERROR]: Input is formatted incorrectly, please fix the file and try again.")
         sys.exit(0)
 
 
@@ -142,7 +142,7 @@ if __name__ == "__main__":
     t1 = threading.Thread(name='server', target=server, args=(asListenPort, ts1Hostname, ts1ListenPort_a, ts2Hosname, ts2ListenPort_a))
     t1.start()
 
-    time.sleep(20)
+    time.sleep(25)
     print("Done.")
     
     #Exit program
