@@ -5,9 +5,8 @@ import sys, os
 import socket
 import hmac
 
-def server(tsListenPort, clientListenPort, tsConnections, key):
-    print(tsListenPort)
-    print clientListenPort
+def server(tsListenPort, tsConnections, key):
+    
     try:
         ss = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print("[S]: Server socket created")
@@ -16,8 +15,10 @@ def server(tsListenPort, clientListenPort, tsConnections, key):
         exit()
 
     server_binding = (socket.gethostbyname(socket.gethostname()), int(tsListenPort))
-    ss.bind(server_binding)
-    ss.listen(1)
+    print("[S]: Server binding is {}".format(str(server_binding)))
+    ss.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    print("[S]: Server bind is " + str(ss.bind(server_binding)))
+    print("[S]: Server listen is " + str(ss.listen(5)))
     host = socket.gethostname()
     print("[S]: Server host name is {}".format(host))
     localhost_ip = (socket.gethostbyname(host))
@@ -60,60 +61,6 @@ def server(tsListenPort, clientListenPort, tsConnections, key):
     # print("TS Com socket closed after AS: " +  str(ss.close()))
     print("TS socket closed after AS")
     ss.close()
-    
-    try:
-        cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        print("[S]: Server socket created")
-    except socket.error as err:
-        print('socket open error: {}\n'.format(err))
-        exit()
-
-    server_binding = (socket.gethostbyname(socket.gethostname()), int(clientListenPort))
-    cs.bind(server_binding)
-    print("Listening for client")
-    cs.listen(10)
-    host = socket.gethostname()
-    print("[S]: Server host name is {}".format(host))
-    localhost_ip = (socket.gethostbyname(host))
-    print("[S]: Server IP address is {}".format(localhost_ip))
-        
-    while True:
-        csockid, addr = cs.accept()
-        print ("[S]: Got a connection request from a client at {}".format(addr))
-        # Receive client msg
-        data_from_server=csockid.recv(200)
-        print("[C]: Data received from client: {}".format(data_from_server.decode('utf-8')))
-        test = data_from_server.split('.')
-        if not data_from_server or data_from_server == 'END':
-            print("[S]: Data from client: " + data_from_server)
-            csockid.send('END'.encode('utf-8'))
-            break
-        elif len(test) == 1:
-            #Create and send back digest
-            digest_query = hmac.new(key.encode("utf-8"), data_from_server.encode("utf-8"))
-            print digest_query
-            print digest_query.hexdigest()
-            csockid.send(digest_query.hexdigest())
-            continue
-
-        data_from_server = data_from_server.lower()
-
-        # Response section
-        #if hostname is in hashtable, connection is in RS. if not, redirect to tS
-        connectionValues = tsConnections.get(data_from_server)
-        #print(connectionValues)
-        msg = ''
-        if connectionValues != None:
-            msg = data_from_server + ' ' + connectionValues[0] + ' ' + connectionValues[1]
-        else:
-            msg = data_from_server + ' - Error:HOST NOT FOUND'
-        csockid.send(msg.encode('utf-8'))
-        
-
-    # Close the server socket
-    
-    print("TS Com socket closed after Client: " +  str(cs.close()))
-    
     exit()
 
 def readFile(filename):
@@ -192,8 +139,11 @@ if __name__ == "__main__":
     createConnections(tsConnections, DNSTSContent)
     
 
-    t1 = threading.Thread(name='server', target=server, args=(sys.argv[1], clientListenPort, tsConnections, keyContent))
+    t1 = threading.Thread(name='server', target=server, args=(sys.argv[1], tsConnections, keyContent))
     t1.start()
+    
+    t2 = threading.Thread(name='C_server', target=server, args=(clientListenPort, tsConnections, keyContent))
+    t2.start()
 
     time.sleep(25)
     print("Done.")
