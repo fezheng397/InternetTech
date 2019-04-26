@@ -7,7 +7,6 @@ import hmac
 import re
 
 def client(asHostName, asListenPort, hostNames, ts1ListenPort, ts2ListenPort):
-    global outputString
     try:
         cs = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         print("[C]: Client socket created")
@@ -39,7 +38,6 @@ def communicateWithAS(cs, hostNames):
     count = 0
     ts_list = []
     for host in hostNames: 
-        count = count + 1
 		# Send data to the server
         wordList = host.split()
         print(wordList)
@@ -62,12 +60,13 @@ def communicateWithAS(cs, hostNames):
         print("[C]: Data received from AServer: {}".format(msg_rcv))
         
         if (msg_rcv is not 'END'):
-            ts_list.append(msg_rcv + " " + wordList[2])
+            ts_list.append(msg_rcv + " " + str(count) + " " + wordList[2])
+        count = count + 1
             
     return ts_list
     
 def communicateWithTS(ts_list, ts1ListenPort, ts2ListenPort):
-    global outputString
+    final_list = []
     ts1_list = []
     ts2_list = []
     for ts_string in ts_list:
@@ -81,18 +80,30 @@ def communicateWithTS(ts_list, ts1ListenPort, ts2ListenPort):
     if (len(ts1_list) is not 0):
         ts1_host = ts1_list[0].split()[1]
         print("[C]: TS1_host : {}".format(ts1_host))
-        ts1_list.append('TS1 ' + ts1_host + ' END')
+        ts1_list.append('TS1 ' + ts1_host + ' -1 END')
         
     if (len(ts2_list) is not 0):
         ts2_host = ts2_list[0].split()[1]
         print("[C]: TS2_host : {}".format(ts2_host))
-        ts2_list.append('TS2 ' + ts2_list[0].split()[1] + ' END')
+        ts2_list.append('TS2 ' + ts2_host + ' -1 END')
         
-    clientTS(ts1_list, ts1ListenPort)
-    clientTS(ts2_list, ts2ListenPort)
+    final_list = clientTS(ts1_list, ts1ListenPort, final_list)
+    final_list = clientTS(ts2_list, ts2ListenPort, final_list)
     
-def clientTS(ts_list, portStr):
-    global outputString
+    try:
+        os.remove('RESOLVED.txt')
+    except OSError:
+        pass
+        
+    output = open("RESOLVED.txt", "a+")
+    final_list.sort(key=getOrder)
+    outputString = ''
+    for item in final_list:
+        outputString = outputString + item[0] + '\n'
+    output.write(outputString)
+    output.close()
+    
+def clientTS(ts_list, portStr, outputList):
     for ts_string in ts_list:
         print("[C]: TS_string to manipulate: {}".format(ts_string))
         ts_strings = ts_string.split()
@@ -118,27 +129,23 @@ def clientTS(ts_list, portStr):
             cs.close()
             exit()
             
-        data_to_server=cs.send(ts_strings[2].encode("utf-8"))
-        print("[C]: Data sent to TServer: {}".format(ts_strings[2]))
+        data_to_server=cs.send(ts_strings[3].encode("utf-8"))
+        print("[C]: Data sent to TServer: {}".format(ts_strings[1]))
 
 	      #Receive data from the server
         data_from_server=cs.recv(100)
         msg_rcv = data_from_server.decode('utf-8')
         print("[C]: Data received from TServer: {}".format(msg_rcv))
-        if (format(msg_rcv) is not 'END'):
-            outputString = outputString + msg_rcv
-            
-        try:
-            os.remove('RESOLVED.txt')
-        except OSError:
-            pass
-        
-        output = open("RESOLVED.txt", "a+")
-        #print(outputString)
-        output.write(outputString)
-        output.close()
+        if (format(msg_rcv) != 'END'):
+            outputTuple = [msg_rcv, ts_strings[2]]
+            outputList.append(outputTuple)
         cs.close()
-         
+    return outputList
+            
+       
+def getOrder(x):
+    return x[1]
+    
 def getAllHostNamesFromFile():
     fileName = open('PROJ3-HNS.txt')
     hostNames = []
@@ -148,8 +155,6 @@ def getAllHostNamesFromFile():
     return hostNames
 
 if __name__ == "__main__":
-    global outputString
-    outputString = ''
     if (len(sys.argv) is not 5 or not sys.argv[2].isdigit() or not sys.argv[4].isdigit()):
         print("Please enter valid parameter syntax")
         sys.exit(0)
